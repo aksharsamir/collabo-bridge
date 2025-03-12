@@ -1,88 +1,209 @@
 
-import { 
-  getUserById,
-  addMessage,
-  getChatById,
-  addUserToChat,
-  createChat,
-  createUser
-} from '@/lib/db';
-import { MessageType } from '@/components/MessageList';
+// Mock data for demonstration purposes
+export const mockUsers = [
+  {
+    id: 'user-1',
+    name: 'John Doe',
+    avatar: undefined,
+    status: 'online',
+  },
+  {
+    id: 'user-2',
+    name: 'Jane Smith',
+    avatar: undefined,
+    status: 'online',
+  },
+  {
+    id: 'user-3',
+    name: 'Robert Johnson',
+    avatar: undefined,
+    status: 'offline',
+  },
+];
 
-// Get current user from localStorage or create a default one
-export function getCurrentUser() {
-  const userId = localStorage.getItem('currentUserId');
-  const userName = localStorage.getItem('currentUserName');
-  
-  if (userId && userName) {
-    return {
-      id: userId,
-      name: userName,
-      status: 'online'
-    };
+// Storage for active chats
+export const activeChats: {
+  [key: string]: {
+    id: string;
+    participants: typeof mockUsers;
+    messages: any[];
   }
-  
-  return null;
+} = {};
+
+// Mock messages data
+export const mockMessages = [
+  {
+    id: 'msg-1',
+    content: 'Hey team! I just uploaded the new design files for the product page.',
+    sender: mockUsers[0],
+    timestamp: new Date(new Date().getTime() - 24 * 60 * 60 * 1000), // Yesterday
+    attachments: [
+      {
+        id: 'file-1',
+        name: 'Product_Design_v2.pdf',
+        type: 'application/pdf',
+        url: '#',
+        size: 2500000,
+        uploadedAt: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
+      }
+    ],
+    isCurrentUser: true,
+  },
+  {
+    id: 'msg-2',
+    content: "Thanks John! I'll take a look at it right away.",
+    sender: mockUsers[1],
+    timestamp: new Date(new Date().getTime() - 23 * 60 * 60 * 1000), // Yesterday
+    isCurrentUser: false,
+  },
+  {
+    id: 'msg-3',
+    content: 'The color scheme looks great! Just one concern about the navigation on mobile.',
+    sender: mockUsers[1],
+    timestamp: new Date(new Date().getTime() - 22 * 60 * 60 * 1000), // Yesterday
+    isCurrentUser: false,
+  },
+  {
+    id: 'msg-4',
+    content: "Here's a screenshot of the issue I'm seeing on smaller screens:",
+    sender: mockUsers[1],
+    timestamp: new Date(new Date().getTime() - 22 * 60 * 60 * 1000), // Yesterday
+    attachments: [
+      {
+        id: 'file-2',
+        name: 'mobile_nav_issue.jpg',
+        type: 'image/jpeg',
+        url: 'https://placehold.co/600x400',
+        size: 150000,
+        uploadedAt: new Date(new Date().getTime() - 22 * 60 * 60 * 1000),
+      }
+    ],
+    isCurrentUser: false,
+  },
+  {
+    id: 'msg-5',
+    content: "Good catch, Jane! I'll fix that navigation issue and upload a new version later today.",
+    sender: mockUsers[0],
+    timestamp: new Date(new Date().getTime() - 21 * 60 * 60 * 1000), // Yesterday
+    isCurrentUser: true,
+  },
+  {
+    id: 'msg-6',
+    content: "I've been working on the backend API documentation. Here it is:",
+    sender: mockUsers[2],
+    timestamp: new Date(new Date().getTime() - 3 * 60 * 60 * 1000), // 3 hours ago
+    attachments: [
+      {
+        id: 'file-3',
+        name: 'API_Documentation_v1.docx',
+        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        url: '#',
+        size: 1200000,
+        uploadedAt: new Date(new Date().getTime() - 3 * 60 * 60 * 1000),
+      }
+    ],
+    isCurrentUser: false,
+  },
+  {
+    id: 'msg-7',
+    content: "Here's the updated design with the mobile navigation fixes.",
+    sender: mockUsers[0],
+    timestamp: new Date(), // Now
+    attachments: [
+      {
+        id: 'file-4',
+        name: 'Product_Design_v3.pdf',
+        type: 'application/pdf',
+        url: '#',
+        size: 2700000,
+        uploadedAt: new Date(),
+      },
+      {
+        id: 'file-5',
+        name: 'design_preview.jpg',
+        type: 'image/jpeg',
+        url: 'https://placehold.co/800x600',
+        size: 350000,
+        uploadedAt: new Date(),
+      }
+    ],
+    isCurrentUser: true,
+  },
+];
+
+export function getMessagesByNewest() {
+  return [...mockMessages].sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 }
 
-// Get messages by chat ID
-export function getMessagesByNewest(chatId?: string): MessageType[] {
-  if (!chatId) return [];
-  
-  const chat = getChatById(chatId);
-  if (!chat) return [];
-  
-  return [...chat.messages].sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+export function getCurrentUser() {
+  return mockUsers[0];
 }
 
-// Send a message
-export function sendMessage(chatId: string, content: string, attachments?: File[]) {
-  const currentUser = getCurrentUser();
-  if (!currentUser) throw new Error('No current user found');
-  
-  let processedAttachments;
-  
-  if (attachments && attachments.length > 0) {
-    processedAttachments = attachments.map(file => ({
+let messageIdCounter = mockMessages.length + 1;
+
+export function sendMessage(content: string, attachments?: File[]) {
+  const newMessage = {
+    id: `msg-${messageIdCounter++}`,
+    content,
+    sender: getCurrentUser(),
+    timestamp: new Date(),
+    isCurrentUser: true,
+    attachments: attachments ? attachments.map(file => ({
+      id: `file-${Date.now()}-${file.name}`,
       name: file.name,
       type: file.type,
-      url: URL.createObjectURL(file),
+      url: URL.createObjectURL(file), // Create a temporary URL for the file
       size: file.size,
-    }));
+      uploadedAt: new Date(),
+    })) : undefined,
+  };
+  
+  // If we're in a shared chat, add the message to the active chat
+  const urlParams = new URLSearchParams(window.location.search);
+  const chatId = urlParams.get('id');
+  
+  if (chatId && activeChats[chatId]) {
+    activeChats[chatId].messages.push(newMessage);
   }
   
-  return addMessage(chatId, currentUser.id, content, processedAttachments);
+  return newMessage;
 }
 
-// Join or create a chat session by ID
-export function joinChatById(chatId: string, user: { id: string; name: string; status: string }) {
-  // Add user to the chat
-  addUserToChat(chatId, user.id);
+// Function to join a chat session by ID
+export function joinChatById(chatId: string) {
+  // In a real app, this would make an API call to join an existing chat
+  // For now, we'll simulate joining the chat
+  if (!activeChats[chatId]) {
+    activeChats[chatId] = {
+      id: chatId,
+      participants: [getCurrentUser()],
+      messages: [...mockMessages]
+    };
+  } else {
+    // Add current user to the chat if not already a participant
+    const chat = activeChats[chatId];
+    const currentUser = getCurrentUser();
+    if (!chat.participants.find(p => p.id === currentUser.id)) {
+      chat.participants.push(currentUser);
+      
+      // Add a system message that the user joined
+      const joinMessage = {
+        id: `system-${Date.now()}`,
+        content: `${currentUser.name} joined the chat`,
+        sender: { 
+          id: 'system', 
+          name: 'System', 
+          status: 'online',
+          avatar: undefined 
+        },
+        timestamp: new Date(),
+        isCurrentUser: false,
+        isSystemMessage: true
+      };
+      
+      chat.messages.push(joinMessage);
+    }
+  }
   
-  // Add a system message that the user joined
-  addMessage(
-    chatId,
-    'system',
-    `${user.name} joined the chat`,
-    undefined,
-    true
-  );
-  
-  return getChatById(chatId);
-}
-
-// Create a new chat
-export function createNewChat() {
-  const currentUser = getCurrentUser();
-  if (!currentUser) throw new Error('No current user found');
-  
-  const chatId = createChat();
-  addUserToChat(chatId, currentUser.id);
-  
-  return chatId;
-}
-
-// Check if a user needs to join (doesn't have stored credentials)
-export function needsToJoin(): boolean {
-  return !localStorage.getItem('currentUserId');
+  return activeChats[chatId];
 }
