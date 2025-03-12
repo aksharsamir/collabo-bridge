@@ -1,12 +1,10 @@
-
 import React from 'react';
 import { 
   FileText, 
   Image as ImageIcon, 
-  FilePdf, 
+  File,
   FileCode, 
   FileSpreadsheet,
-  File,
   Download,
   ExternalLink,
   X
@@ -41,7 +39,7 @@ export const FilePreview = ({ file, onClose, onDownload }: FilePreviewProps) => 
   
   const getFileIcon = () => {
     if (isImage) return <ImageIcon className="w-16 h-16 text-blue-500" />;
-    if (isPdf) return <FilePdf className="w-16 h-16 text-red-500" />;
+    if (isPdf) return <FileText className="w-16 h-16 text-red-500" />;
     if (isSpreadsheet) return <FileSpreadsheet className="w-16 h-16 text-green-500" />;
     if (isCode) return <FileCode className="w-16 h-16 text-purple-500" />;
     return <FileText className="w-16 h-16 text-gray-500" />;
