@@ -1,3 +1,4 @@
+
 // Mock data for demonstration purposes
 export const mockUsers = [
   {
@@ -19,6 +20,9 @@ export const mockUsers = [
     status: 'offline',
   },
 ];
+
+// Storage for active chats
+export const activeChats = {};
 
 // Mock messages data
 export const mockMessages = [
@@ -149,4 +153,26 @@ export function sendMessage(content: string, attachments?: File[]) {
   };
   
   return newMessage;
+}
+
+// Function to join a chat session by ID
+export function joinChatById(chatId: string) {
+  // In a real app, this would make an API call to join an existing chat
+  // For now, we'll simulate joining the chat
+  if (!activeChats[chatId]) {
+    activeChats[chatId] = {
+      id: chatId,
+      participants: [getCurrentUser()],
+      messages: [...mockMessages]
+    };
+  } else {
+    // Add current user to the chat if not already a participant
+    const chat = activeChats[chatId];
+    const currentUser = getCurrentUser();
+    if (!chat.participants.find(p => p.id === currentUser.id)) {
+      chat.participants.push(currentUser);
+    }
+  }
+  
+  return activeChats[chatId];
 }
