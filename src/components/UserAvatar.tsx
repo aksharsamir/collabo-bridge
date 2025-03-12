@@ -4,7 +4,7 @@ import React from 'react';
 interface UserAvatarProps {
   name: string;
   image?: string;
-  size?: 'xs' | 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg';
   status?: 'online' | 'offline' | 'away';
 }
 
@@ -17,7 +17,6 @@ export const UserAvatar = ({ name, image, size = 'md', status }: UserAvatarProps
     .substring(0, 2);
     
   const sizeClasses = {
-    xs: 'w-5 h-5 text-[10px]',
     sm: 'w-8 h-8 text-xs',
     md: 'w-10 h-10 text-sm',
     lg: 'w-14 h-14 text-base',
@@ -42,7 +41,7 @@ export const UserAvatar = ({ name, image, size = 'md', status }: UserAvatarProps
       
       {status && (
         <span 
-          className={`absolute bottom-0 right-0 ${size === 'xs' ? 'w-2 h-2' : 'w-3 h-3'} rounded-full border-2 border-background
+          className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-background
             ${status === 'online' ? 'bg-green-500' : 
               status === 'away' ? 'bg-yellow-500' : 'bg-gray-400'}`}
         />
