@@ -190,7 +190,12 @@ export function joinChatById(chatId: string) {
       const joinMessage = {
         id: `system-${Date.now()}`,
         content: `${currentUser.name} joined the chat`,
-        sender: { id: 'system', name: 'System', status: 'online' },
+        sender: { 
+          id: 'system', 
+          name: 'System', 
+          status: 'online',
+          avatar: undefined 
+        },
         timestamp: new Date(),
         isCurrentUser: false,
         isSystemMessage: true

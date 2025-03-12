@@ -2,28 +2,30 @@
 import React, { useRef, useEffect } from 'react';
 import { Message } from './Message';
 
-interface MessageListProps {
-  messages: Array<{
+export interface MessageType {
+  id: string;
+  content: string;
+  sender: {
     id: string;
-    content: string;
-    sender: {
-      id: string;
-      name: string;
-      avatar?: string;
-      status?: string;
-    };
-    timestamp: Date;
-    attachments?: Array<{
-      id: string;
-      name: string;
-      type: string;
-      url: string;
-      size: number;
-      uploadedAt: Date;
-    }>;
-    isCurrentUser: boolean;
-    isSystemMessage?: boolean;
+    name: string;
+    avatar?: string;
+    status?: string;
+  };
+  timestamp: Date;
+  attachments?: Array<{
+    id: string;
+    name: string;
+    type: string;
+    url: string;
+    size: number;
+    uploadedAt: Date;
   }>;
+  isCurrentUser: boolean;
+  isSystemMessage?: boolean;
+}
+
+interface MessageListProps {
+  messages: MessageType[];
   onFileView: (file: any) => void;
 }
 

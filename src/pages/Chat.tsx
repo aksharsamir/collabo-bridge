@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { MessageList } from '@/components/MessageList';
+import { MessageList, MessageType } from '@/components/MessageList';
 import { MessageInput } from '@/components/MessageInput';
 import { FilePreview } from '@/components/FilePreview';
 import { getMessagesByNewest, sendMessage, joinChatById, getCurrentUser, mockUsers } from '@/utils/messageUtils';
@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import { UserAvatar } from '@/components/UserAvatar';
 
 const Chat = () => {
-  const [messages, setMessages] = useState(getMessagesByNewest());
+  const [messages, setMessages] = useState<MessageType[]>(getMessagesByNewest());
   const [selectedFile, setSelectedFile] = useState<any>(null);
   const [isFilePreviewOpen, setIsFilePreviewOpen] = useState(false);
   const [chatId, setChatId] = useState('');
@@ -44,10 +44,15 @@ const Chat = () => {
           setChatParticipants(updatedParticipants);
           
           // Add a system message that the user joined
-          const joinMessage = {
+          const joinMessage: MessageType = {
             id: `system-${Date.now()}`,
             content: `${randomUser.name} joined the chat`,
-            sender: { id: 'system', name: 'System', status: 'online' },
+            sender: { 
+              id: 'system', 
+              name: 'System', 
+              status: 'online',
+              avatar: undefined 
+            },
             timestamp: new Date(),
             isCurrentUser: false,
             isSystemMessage: true
@@ -57,7 +62,7 @@ const Chat = () => {
           
           // Make the user send a greeting message after a delay
           setTimeout(() => {
-            const greeting = {
+            const greeting: MessageType = {
               id: `msg-${Date.now()}`,
               content: `Hello everyone! I just joined via the shared link.`,
               sender: randomUser,
@@ -100,7 +105,7 @@ const Chat = () => {
           ];
           const randomContent = randomMessages[Math.floor(Math.random() * randomMessages.length)];
           
-          const newMessage = {
+          const newMessage: MessageType = {
             id: `msg-${Date.now()}`,
             content: randomContent,
             sender: randomUser,
