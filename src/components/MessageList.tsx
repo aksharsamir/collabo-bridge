@@ -10,6 +10,7 @@ interface MessageListProps {
       id: string;
       name: string;
       avatar?: string;
+      status?: string;
     };
     timestamp: Date;
     attachments?: Array<{
@@ -21,6 +22,7 @@ interface MessageListProps {
       uploadedAt: Date;
     }>;
     isCurrentUser: boolean;
+    isSystemMessage?: boolean;
   }>;
   onFileView: (file: any) => void;
 }
@@ -81,11 +83,28 @@ export const MessageList = ({ messages, onFileView }: MessageListProps) => {
           </div>
           
           {msgs.map((message, index) => {
+            // System messages don't need consecutive handling
+            if (message.isSystemMessage) {
+              return (
+                <Message
+                  key={message.id}
+                  message={message}
+                  showSender={false}
+                  isConsecutive={false}
+                  onFileView={onFileView}
+                />
+              );
+            }
+            
             // Check if we need to show sender info (hide it if consecutive messages from same sender)
-            const showSender = index === 0 || msgs[index - 1].sender.id !== message.sender.id;
+            const showSender = index === 0 || 
+              msgs[index - 1].isSystemMessage || 
+              msgs[index - 1].sender.id !== message.sender.id;
             
             // Handle consecutive messages from the same sender
-            const isConsecutive = index > 0 && msgs[index - 1].sender.id === message.sender.id;
+            const isConsecutive = index > 0 && 
+              !msgs[index - 1].isSystemMessage &&
+              msgs[index - 1].sender.id === message.sender.id;
             
             return (
               <Message

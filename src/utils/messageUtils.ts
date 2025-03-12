@@ -22,7 +22,13 @@ export const mockUsers = [
 ];
 
 // Storage for active chats
-export const activeChats = {};
+export const activeChats: {
+  [key: string]: {
+    id: string;
+    participants: typeof mockUsers;
+    messages: any[];
+  }
+} = {};
 
 // Mock messages data
 export const mockMessages = [
@@ -45,7 +51,7 @@ export const mockMessages = [
   },
   {
     id: 'msg-2',
-    content: 'Thanks John! I\'ll take a look at it right away.',
+    content: "Thanks John! I'll take a look at it right away.",
     sender: mockUsers[1],
     timestamp: new Date(new Date().getTime() - 23 * 60 * 60 * 1000), // Yesterday
     isCurrentUser: false,
@@ -59,7 +65,7 @@ export const mockMessages = [
   },
   {
     id: 'msg-4',
-    content: 'Here\'s a screenshot of the issue I\'m seeing on smaller screens:',
+    content: "Here's a screenshot of the issue I'm seeing on smaller screens:",
     sender: mockUsers[1],
     timestamp: new Date(new Date().getTime() - 22 * 60 * 60 * 1000), // Yesterday
     attachments: [
@@ -76,14 +82,14 @@ export const mockMessages = [
   },
   {
     id: 'msg-5',
-    content: 'Good catch, Jane! I\'ll fix that navigation issue and upload a new version later today.',
+    content: "Good catch, Jane! I'll fix that navigation issue and upload a new version later today.",
     sender: mockUsers[0],
     timestamp: new Date(new Date().getTime() - 21 * 60 * 60 * 1000), // Yesterday
     isCurrentUser: true,
   },
   {
     id: 'msg-6',
-    content: 'I\'ve been working on the backend API documentation. Here it is:',
+    content: "I've been working on the backend API documentation. Here it is:",
     sender: mockUsers[2],
     timestamp: new Date(new Date().getTime() - 3 * 60 * 60 * 1000), // 3 hours ago
     attachments: [
@@ -100,7 +106,7 @@ export const mockMessages = [
   },
   {
     id: 'msg-7',
-    content: 'Here\'s the updated design with the mobile navigation fixes.',
+    content: "Here's the updated design with the mobile navigation fixes.",
     sender: mockUsers[0],
     timestamp: new Date(), // Now
     attachments: [
@@ -152,6 +158,14 @@ export function sendMessage(content: string, attachments?: File[]) {
     })) : undefined,
   };
   
+  // If we're in a shared chat, add the message to the active chat
+  const urlParams = new URLSearchParams(window.location.search);
+  const chatId = urlParams.get('id');
+  
+  if (chatId && activeChats[chatId]) {
+    activeChats[chatId].messages.push(newMessage);
+  }
+  
   return newMessage;
 }
 
@@ -171,6 +185,18 @@ export function joinChatById(chatId: string) {
     const currentUser = getCurrentUser();
     if (!chat.participants.find(p => p.id === currentUser.id)) {
       chat.participants.push(currentUser);
+      
+      // Add a system message that the user joined
+      const joinMessage = {
+        id: `system-${Date.now()}`,
+        content: `${currentUser.name} joined the chat`,
+        sender: { id: 'system', name: 'System', status: 'online' },
+        timestamp: new Date(),
+        isCurrentUser: false,
+        isSystemMessage: true
+      };
+      
+      chat.messages.push(joinMessage);
     }
   }
   

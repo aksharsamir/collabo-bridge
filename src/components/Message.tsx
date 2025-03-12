@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { UserAvatar } from './UserAvatar';
-import { Paperclip, FileText, Image as ImageIcon, Film, Music, File } from 'lucide-react';
+import { Paperclip, FileText, Image as ImageIcon, Film, Music, File, Info } from 'lucide-react';
 
 interface MessageProps {
   message: {
@@ -11,6 +11,7 @@ interface MessageProps {
       id: string;
       name: string;
       avatar?: string;
+      status?: string;
     };
     timestamp: Date;
     attachments?: Array<{
@@ -22,6 +23,7 @@ interface MessageProps {
       uploadedAt: Date;
     }>;
     isCurrentUser: boolean;
+    isSystemMessage?: boolean;
   };
   showSender?: boolean;
   isConsecutive?: boolean;
@@ -29,7 +31,7 @@ interface MessageProps {
 }
 
 export const Message = ({ message, showSender = true, isConsecutive = false, onFileView }: MessageProps) => {
-  const { content, sender, timestamp, attachments, isCurrentUser } = message;
+  const { content, sender, timestamp, attachments, isCurrentUser, isSystemMessage } = message;
   
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('en-US', { 
@@ -50,6 +52,18 @@ export const Message = ({ message, showSender = true, isConsecutive = false, onF
       return <File className="w-4 h-4" />;
     }
   };
+
+  // Render system messages differently
+  if (isSystemMessage) {
+    return (
+      <div className="flex justify-center my-2">
+        <div className="flex items-center gap-1 bg-muted/30 text-muted-foreground px-3 py-1 rounded-full text-xs">
+          <Info className="w-3 h-3" />
+          <span>{content}</span>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div 
@@ -57,7 +71,7 @@ export const Message = ({ message, showSender = true, isConsecutive = false, onF
     >
       {!isCurrentUser && showSender && (
         <div className="mr-3 mt-1">
-          <UserAvatar name={sender.name} image={sender.avatar} size="sm" />
+          <UserAvatar name={sender.name} image={sender.avatar} size="sm" status={sender.status as 'online' | 'offline' | 'away'} />
         </div>
       )}
       

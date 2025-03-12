@@ -1,22 +1,47 @@
 
 import React, { useState, useRef } from 'react';
-import { Send, Paperclip, X } from 'lucide-react';
+import { Send, Paperclip, X, Users } from 'lucide-react';
 import { FileUpload } from './FileUpload';
+import { UserAvatar } from './UserAvatar';
 
 interface MessageInputProps {
   onSendMessage: (message: string, attachments?: File[]) => void;
+  participants?: Array<{
+    id: string;
+    name: string;
+    avatar?: string;
+    status: string;
+  }>;
 }
 
-export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
+export const MessageInput = ({ onSendMessage, participants = [] }: MessageInputProps) => {
   const [message, setMessage] = useState('');
   const [attachments, setAttachments] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [showTypingIndicator, setShowTypingIndicator] = useState(false);
+  const [typingUser, setTypingUser] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
+    } else {
+      // Simulate other user typing
+      if (participants.length > 1 && !showTypingIndicator && message.length > 5) {
+        const otherUsers = participants.filter(p => p.id !== 'user-1');
+        if (otherUsers.length > 0) {
+          const randomUser = otherUsers[Math.floor(Math.random() * otherUsers.length)];
+          setTypingUser(randomUser.name);
+          setShowTypingIndicator(true);
+          
+          // Remove typing indicator after a random time
+          setTimeout(() => {
+            setShowTypingIndicator(false);
+            setTypingUser(null);
+          }, Math.random() * 3000 + 1000);
+        }
+      }
     }
   };
   
@@ -55,6 +80,21 @@ export const MessageInput = ({ onSendMessage }: MessageInputProps) => {
   
   return (
     <div className="glass-morphism rounded-lg p-4 transition-all duration-300 ease-in-out">
+      {participants.length > 1 && (
+        <div className="flex items-center mb-2 gap-1 text-xs text-muted-foreground">
+          <Users className="w-3 h-3" />
+          <span>
+            {participants.length} {participants.length === 1 ? 'person' : 'people'} in this conversation
+          </span>
+        </div>
+      )}
+      
+      {showTypingIndicator && typingUser && (
+        <div className="text-xs text-muted-foreground italic mb-2">
+          {typingUser} is typing...
+        </div>
+      )}
+      
       {attachments.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-3">
           {attachments.map((file, index) => (
