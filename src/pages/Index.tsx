@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MessageSquare, FileText, Settings, Users } from 'lucide-react';
@@ -28,7 +27,7 @@ const Index = () => {
     {
       icon: <Settings className="w-8 h-8 text-primary" />,
       title: 'Customization',
-      description: 'Personalize your workspace to fit your team's needs.',
+      description: 'Personalize your workspace to fit your team\'s needs.',
       path: '/settings',
     }
   ];

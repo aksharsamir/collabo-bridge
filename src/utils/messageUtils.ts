@@ -1,4 +1,3 @@
-
 // Mock data for demonstration purposes
 export const mockUsers = [
   {
@@ -42,7 +41,7 @@ export const mockMessages = [
   },
   {
     id: 'msg-2',
-    content: 'Thanks John! I'll take a look at it right away.',
+    content: 'Thanks John! I\'ll take a look at it right away.',
     sender: mockUsers[1],
     timestamp: new Date(new Date().getTime() - 23 * 60 * 60 * 1000), // Yesterday
     isCurrentUser: false,
@@ -56,7 +55,7 @@ export const mockMessages = [
   },
   {
     id: 'msg-4',
-    content: 'Here's a screenshot of the issue I'm seeing on smaller screens:',
+    content: 'Here\'s a screenshot of the issue I\'m seeing on smaller screens:',
     sender: mockUsers[1],
     timestamp: new Date(new Date().getTime() - 22 * 60 * 60 * 1000), // Yesterday
     attachments: [
@@ -73,14 +72,14 @@ export const mockMessages = [
   },
   {
     id: 'msg-5',
-    content: 'Good catch, Jane! I'll fix that navigation issue and upload a new version later today.',
+    content: 'Good catch, Jane! I\'ll fix that navigation issue and upload a new version later today.',
     sender: mockUsers[0],
     timestamp: new Date(new Date().getTime() - 21 * 60 * 60 * 1000), // Yesterday
     isCurrentUser: true,
   },
   {
     id: 'msg-6',
-    content: 'I've been working on the backend API documentation. Here it is:',
+    content: 'I\'ve been working on the backend API documentation. Here it is:',
     sender: mockUsers[2],
     timestamp: new Date(new Date().getTime() - 3 * 60 * 60 * 1000), // 3 hours ago
     attachments: [
