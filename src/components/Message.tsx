@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { UserAvatar } from './UserAvatar';
-import { Paperclip, FileText, Image as ImageIcon, Film, Music, File, Info } from 'lucide-react';
+import { Paperclip, FileText, Image as ImageIcon, Film, Music, File, Info, Check, CheckCheck } from 'lucide-react';
 
 interface MessageProps {
   message: {
@@ -65,6 +65,19 @@ export const Message = ({ message, showSender = true, isConsecutive = false, onF
     );
   }
   
+  // Generate message shape class
+  const getMessageShapeClass = () => {
+    if (isCurrentUser) {
+      return isConsecutive 
+        ? 'rounded-lg rounded-br-sm' 
+        : 'rounded-lg rounded-br-sm';
+    } else {
+      return isConsecutive 
+        ? 'rounded-lg rounded-bl-sm' 
+        : 'rounded-lg rounded-bl-sm';
+    }
+  };
+  
   return (
     <div 
       className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} ${isConsecutive ? 'mt-1' : 'mt-4'}`}
@@ -83,13 +96,14 @@ export const Message = ({ message, showSender = true, isConsecutive = false, onF
         {showSender && !isCurrentUser && (
           <div className="ml-1 mb-1 flex items-center">
             <span className="text-sm font-medium">{sender.name}</span>
-            <span className="text-xs text-muted-foreground ml-2">{formatTime(timestamp)}</span>
           </div>
         )}
         
         <div className={`
-          rounded-lg ${isCurrentUser ? 'bg-primary text-primary-foreground' : 'glass-morphism'}
-          ${content ? 'px-4 py-3' : ''}
+          ${getMessageShapeClass()} 
+          ${isCurrentUser ? 'bg-[#dcf8c6] text-gray-800' : 'bg-white dark:bg-gray-800 dark:text-gray-100'}
+          ${content ? 'px-4 py-2.5' : ''}
+          shadow-sm
         `}>
           {content && (
             <div className="text-sm whitespace-pre-wrap break-words">{content}</div>
@@ -123,7 +137,7 @@ export const Message = ({ message, showSender = true, isConsecutive = false, onF
                     onClick={() => onFileView(file)}
                     className={`
                       flex items-center rounded-md p-3
-                      ${isCurrentUser ? 'bg-primary-foreground/10 hover:bg-primary-foreground/20' : 'bg-secondary hover:bg-secondary/70'}
+                      ${isCurrentUser ? 'bg-[#c5e9b3] hover:bg-[#c5e9b3]/90' : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'}
                       cursor-pointer transition-colors
                     `}
                   >
@@ -141,13 +155,16 @@ export const Message = ({ message, showSender = true, isConsecutive = false, onF
               })}
             </div>
           )}
-        </div>
-        
-        {(showSender && isCurrentUser || !showSender && isCurrentUser) && (
-          <div className="mr-1 mt-1 text-xs text-muted-foreground">
-            {formatTime(timestamp)}
+          
+          <div className="flex items-center justify-end space-x-1 mt-1">
+            <span className="text-[10px] text-gray-500 dark:text-gray-400 inline-block">
+              {formatTime(timestamp)}
+            </span>
+            {isCurrentUser && (
+              <CheckCheck className="w-3 h-3 text-blue-500" />
+            )}
           </div>
-        )}
+        </div>
       </div>
       
       {isCurrentUser && showSender && (

@@ -1,6 +1,6 @@
 
 import React, { useState, useRef } from 'react';
-import { Send, Paperclip, X, Users } from 'lucide-react';
+import { Send, Paperclip, X, Users, Smile, Mic } from 'lucide-react';
 import { FileUpload } from './FileUpload';
 import { UserAvatar } from './UserAvatar';
 
@@ -20,6 +20,7 @@ export const MessageInput = ({ onSendMessage, participants = [] }: MessageInputP
   const [isUploading, setIsUploading] = useState(false);
   const [showTypingIndicator, setShowTypingIndicator] = useState(false);
   const [typingUser, setTypingUser] = useState<string | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -78,8 +79,18 @@ export const MessageInput = ({ onSendMessage, participants = [] }: MessageInputP
     setAttachments(prev => prev.filter((_, i) => i !== index));
   };
   
+  const toggleRecording = () => {
+    setIsRecording(!isRecording);
+    if (!isRecording) {
+      // Simulate recording start
+      setTimeout(() => {
+        setIsRecording(false);
+      }, 5000);
+    }
+  };
+  
   return (
-    <div className="glass-morphism rounded-lg p-4 transition-all duration-300 ease-in-out">
+    <div className="bg-white dark:bg-gray-800 rounded-lg px-4 pt-3 pb-3 shadow-sm transition-all duration-300 ease-in-out">
       {participants.length > 1 && (
         <div className="flex items-center mb-2 gap-1 text-xs text-muted-foreground">
           <Users className="w-3 h-3" />
@@ -90,7 +101,7 @@ export const MessageInput = ({ onSendMessage, participants = [] }: MessageInputP
       )}
       
       {showTypingIndicator && typingUser && (
-        <div className="text-xs text-muted-foreground italic mb-2">
+        <div className="text-xs text-green-600 italic mb-2">
           {typingUser} is typing...
         </div>
       )}
@@ -100,7 +111,7 @@ export const MessageInput = ({ onSendMessage, participants = [] }: MessageInputP
           {attachments.map((file, index) => (
             <div 
               key={index} 
-              className="bg-secondary rounded-md px-3 py-1.5 flex items-center text-sm animate-scale-in"
+              className="bg-gray-100 dark:bg-gray-700 rounded-md px-3 py-1.5 flex items-center text-sm animate-scale-in"
             >
               <span className="truncate max-w-[150px]">{file.name}</span>
               <button 
@@ -114,16 +125,20 @@ export const MessageInput = ({ onSendMessage, participants = [] }: MessageInputP
         </div>
       )}
       
-      <div className="flex items-end space-x-2">
+      <div className="flex items-end space-x-2 bg-gray-100 dark:bg-gray-700 rounded-full pl-3 pr-1 py-1">
+        <button className="p-2 text-muted-foreground hover:text-foreground transition-colors rounded-full">
+          <Smile className="w-5 h-5" />
+        </button>
+        
         <FileUpload 
           onFilesSelected={handleAddAttachments} 
           isLoading={isUploading}
         >
           <button 
-            className="p-2 rounded-md hover:bg-secondary transition-colors"
+            className="p-2 text-muted-foreground hover:text-foreground transition-colors rounded-full"
             disabled={isUploading}
           >
-            <Paperclip className="w-5 h-5 text-muted-foreground" />
+            <Paperclip className="w-5 h-5" />
           </button>
         </FileUpload>
         
@@ -133,18 +148,25 @@ export const MessageInput = ({ onSendMessage, participants = [] }: MessageInputP
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           placeholder="Type a message..."
-          className="flex-1 bg-transparent border-none focus:ring-0 focus:outline-none resize-none max-h-32 py-2 px-3"
+          className="flex-1 bg-transparent border-none focus:ring-0 focus:outline-none resize-none max-h-32 py-2 px-3 text-sm"
           rows={1}
         />
         
-        <button 
-          onClick={handleSendMessage}
-          disabled={!message.trim() && attachments.length === 0}
-          className={`p-2 rounded-full bg-primary text-primary-foreground transition-all duration-200 
-            ${(!message.trim() && attachments.length === 0) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary/90'}`}
-        >
-          <Send className="w-5 h-5" />
-        </button>
+        {!message.trim() && attachments.length === 0 ? (
+          <button 
+            onClick={toggleRecording}
+            className={`p-3 rounded-full transition-all duration-200 ${isRecording ? 'bg-red-500 text-white' : 'bg-primary text-primary-foreground'}`}
+          >
+            <Mic className="w-5 h-5" />
+          </button>
+        ) : (
+          <button 
+            onClick={handleSendMessage}
+            className="p-3 rounded-full bg-primary text-primary-foreground transition-all duration-200 hover:bg-primary/90"
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        )}
       </div>
     </div>
   );

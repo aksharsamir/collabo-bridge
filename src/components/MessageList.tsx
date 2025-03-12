@@ -79,7 +79,7 @@ export const MessageList = ({ messages, onFileView }: MessageListProps) => {
       {Object.entries(groupedMessages).map(([date, msgs]) => (
         <div key={date} className="space-y-4">
           <div className="flex justify-center">
-            <div className="px-3 py-1 rounded-full text-xs bg-secondary text-secondary-foreground">
+            <div className="px-3 py-1 rounded-full text-xs bg-secondary/70 text-secondary-foreground">
               {renderDateLabel(date)}
             </div>
           </div>

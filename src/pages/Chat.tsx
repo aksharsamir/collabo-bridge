@@ -5,7 +5,7 @@ import { MessageInput } from '@/components/MessageInput';
 import { FilePreview } from '@/components/FilePreview';
 import { getMessagesByNewest, sendMessage, joinChatById, getCurrentUser, mockUsers } from '@/utils/messageUtils';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { Link2, Copy, Check, Users } from 'lucide-react';
+import { Link2, Copy, Check, Users, Phone, Video, Search, MoreVertical } from 'lucide-react';
 import { toast } from 'sonner';
 import { UserAvatar } from '@/components/UserAvatar';
 
@@ -170,67 +170,99 @@ const Chat = () => {
   
   return (
     <div className="flex flex-col h-[calc(100vh-150px)]">
-      <div className="glass-morphism p-6 rounded-lg mb-6">
+      <div className="bg-[#00a884] dark:bg-gray-800 p-3 rounded-t-lg mb-1">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Team Chat</h1>
-          
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowParticipants(!showParticipants)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-secondary/50 hover:bg-secondary/80 transition-colors"
-              title="View participants"
-            >
-              <Users className="w-4 h-4" />
-              <span className="text-sm">Participants ({chatParticipants.length})</span>
-            </button>
+          <div className="flex items-center gap-3">
+            {chatParticipants.length > 1 ? (
+              <div className="relative">
+                <UserAvatar 
+                  name={chatParticipants[1].name} 
+                  image={chatParticipants[1].avatar} 
+                  size="md" 
+                  status={chatParticipants[1].status as 'online' | 'offline' | 'away'} 
+                />
+                <div className="absolute -bottom-1 -right-1">
+                  <div className="flex -space-x-2">
+                    {chatParticipants.slice(2, 4).map((user, i) => (
+                      <div key={i} className="relative w-5 h-5 rounded-full border-2 border-[#00a884] dark:border-gray-800 z-10">
+                        <UserAvatar 
+                          name={user.name} 
+                          image={user.avatar} 
+                          size="xs" 
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <UserAvatar 
+                name="Team Chat" 
+                size="md" 
+              />
+            )}
             
-            <button
-              onClick={shareLink}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary/10 hover:bg-primary/20 transition-colors"
-              title="Share chat link"
+            <div>
+              <h1 className="font-semibold text-white">
+                {chatParticipants.length > 1 
+                  ? `${chatParticipants[1].name}${chatParticipants.length > 2 ? ` and ${chatParticipants.length - 2} others` : ''}` 
+                  : 'Team Chat'}
+              </h1>
+              <div className="text-xs text-green-100">
+                {chatParticipants.filter(p => p.status === 'online').length} online
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <button className="text-white hover:bg-white/10 p-2 rounded-full transition-colors">
+              <Video className="w-5 h-5" />
+            </button>
+            <button className="text-white hover:bg-white/10 p-2 rounded-full transition-colors">
+              <Phone className="w-5 h-5" />
+            </button>
+            <button className="text-white hover:bg-white/10 p-2 rounded-full transition-colors">
+              <Search className="w-5 h-5" />
+            </button>
+            <button 
+              onClick={() => setShowParticipants(!showParticipants)} 
+              className="text-white hover:bg-white/10 p-2 rounded-full transition-colors"
             >
-              {copied ? (
-                <Check className="w-4 h-4" />
-              ) : (
-                <Link2 className="w-4 h-4" />
-              )}
-              <span className="text-sm">Share Link</span>
+              <MoreVertical className="w-5 h-5" />
             </button>
           </div>
         </div>
         
-        {chatId && (
-          <div className="mt-2 flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">Chat ID: {chatId}</span>
-            <button
-              onClick={shareLink}
-              className="text-xs text-primary hover:underline"
-            >
-              <Copy className="w-3 h-3 inline mr-1" />
-              Copy invite link
-            </button>
-          </div>
-        )}
-        
         {showParticipants && (
-          <div className="mt-4 p-3 bg-background/40 rounded-md">
-            <h3 className="text-sm font-medium mb-2">Active Participants:</h3>
+          <div className="mt-4 p-3 bg-white/10 rounded-md">
+            <h3 className="text-sm font-medium mb-2 text-white">Participants:</h3>
             <div className="flex flex-wrap gap-2">
               {chatParticipants.map(user => (
-                <div key={user.id} className="flex items-center gap-2 px-2 py-1 bg-background/30 rounded-md">
+                <div key={user.id} className="flex items-center gap-2 px-2 py-1 bg-white/10 rounded-md">
                   <UserAvatar name={user.name} image={user.avatar} size="sm" status={user.status as 'online' | 'offline' | 'away'} />
-                  <span className="text-xs font-medium">{user.name}</span>
+                  <span className="text-xs font-medium text-white">{user.name}</span>
                   {user.id === currentUser.id && (
-                    <span className="text-xs bg-primary/20 text-primary px-1 rounded">You</span>
+                    <span className="text-xs bg-white/20 text-white px-1 rounded">You</span>
                   )}
                 </div>
               ))}
+            </div>
+            
+            <div className="mt-3 flex justify-between">
+              <span className="text-xs text-white/80">Chat ID: {chatId}</span>
+              <button
+                onClick={shareLink}
+                className="flex items-center gap-1 text-xs text-white hover:underline"
+              >
+                {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                Copy invite link
+              </button>
             </div>
           </div>
         )}
       </div>
       
-      <div className="flex-1 overflow-y-auto glass-morphism rounded-lg p-4 mb-6">
+      <div className="flex-1 overflow-y-auto bg-[url('https://web.whatsapp.com/img/bg-chat-tile-dark_a4be512e7195b6b733d9110b408f075d.png')] bg-repeat p-4 mb-1">
         <MessageList 
           messages={messages} 
           onFileView={handleFileView} 
